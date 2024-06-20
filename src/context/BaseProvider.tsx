@@ -4,8 +4,7 @@ import React from 'react';
 
 import { ThemeProvider } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { authOptions } from 'app/api/auth/[...nextauth]/route';
-import { Session, getServerSession } from 'next-auth';
+import { Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { SnackbarProvider } from 'notistack';
 import { BuildTheme } from 'theme/Theme';
