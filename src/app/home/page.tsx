@@ -1,9 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense, useCallback } from 'react';
 
+import { LoadingButton } from '@mui/lab';
 import { Button, styled } from '@mui/material';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { signOut, useSession } from 'next-auth/react';
+import { enqueueSnackbar } from 'notistack';
 import { IoMdCloudUpload } from 'react-icons/io';
+
+import OCRCard from '@components/OCRCard';
+import OCRCardLoading from '@components/OCRCardLoading';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -18,8 +25,59 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const Home: React.FC = () => {
-  const [file, setFile] = React.useState<File>();
-  console.log(file);
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+
+  const { data } = useSession();
+
+  const fetchApi = useQuery({
+    queryFn: async () => {
+      return await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(
+            fetch('http://localhost:1234/', {
+              method: 'GET',
+              headers: {
+                Authorization: `Bearer ${(data as any)?.apiToken?.access_token}`,
+              },
+            })
+          );
+        }, 2000);
+      });
+    },
+    queryKey: ['get'],
+  });
+
+  const sendFileRequest = useMutation({
+    mutationFn: async () => {
+      const formData = new FormData();
+      formData.append('file', selectedFile as File);
+      return await fetch('http://localhost:1234/invoices/ocr', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${(data as any)?.apiToken?.access_token}`,
+        },
+        body: formData,
+      });
+    },
+    onSuccess: () => {
+      enqueueSnackbar('File uploaded successfully', { variant: 'success' });
+    },
+    onError: () => {
+      enqueueSnackbar('Error uploading file', { variant: 'error' });
+    },
+  });
+
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const selectedFile = event.target.files?.[0];
+      if (selectedFile) {
+        setSelectedFile(selectedFile);
+        sendFileRequest.mutate();
+      }
+    },
+    [sendFileRequest]
+  );
+
   return (
     <main>
       <div className="flex flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -29,48 +87,34 @@ const Home: React.FC = () => {
           </h2>
         </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm bg-white p-12 rounded-lg">
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-lg bg-white p-12 rounded-lg">
           <form className="space-y-6" action="#" method="POST">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div>
               <div className="flex items-center justify-between">
-                <Button
+                <LoadingButton
                   component="label"
                   role={undefined}
                   variant="contained"
                   tabIndex={-1}
                   startIcon={<IoMdCloudUpload />}
                   fullWidth
-                  className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  size="large"
+                  loading={sendFileRequest.isPending}
                 >
                   Upload file
                   <VisuallyHiddenInput
-                    onChange={(e) => setFile(e.target.files?.[0])}
+                    onChange={handleFileChange}
                     type="file"
                   />
-                </Button>
+                </LoadingButton>
               </div>
             </div>
           </form>
         </div>
+
+        <OCRCard />
+
+        <Button onClick={async () => await signOut()}>Logout</Button>
       </div>
     </main>
   );
