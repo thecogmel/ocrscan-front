@@ -33,12 +33,15 @@ const Home: React.FC = () => {
 
   const fetchInvoices = useQuery({
     queryFn: async () => {
-      const response = await fetch(`http://127.0.0.1:2345/invoices/`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${(data as any)?.apiToken?.access_token}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/invoices/`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${(data as any)?.apiToken?.access_token}`,
+          },
+        }
+      );
       return response.json() as Promise<Invoice[]>;
     },
     queryKey: ['invoices'],
@@ -48,7 +51,7 @@ const Home: React.FC = () => {
     mutationFn: async () => {
       const formData = new FormData();
       formData.append('file', selectedFile as File);
-      return await fetch(`${process.env.BASE_URL}/invoices/ocr`, {
+      return await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/invoices/ocr`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${(data as any)?.apiToken?.access_token}`,
@@ -115,6 +118,13 @@ const Home: React.FC = () => {
           </div>
         ) : (
           <div>
+            {fetchInvoices.data?.length === 0 && (
+              <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-lg bg-white p-6 rounded-lg">
+                <h1 className="w-full text-center text-2xl font-bold text-slate-400">
+                  No invoices found
+                </h1>
+              </div>
+            )}
             {fetchInvoices.data?.map((invoice) => (
               <OCRCard key={invoice.id} invoice={invoice} />
             ))}

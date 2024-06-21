@@ -9,4 +9,14 @@ interface Invoice {
   url: string;
   status: string;
   processed_at: Date | null;
+  items: Item[];
+}
+
+interface Item {
+  id: string;
+  quantity: number;
+  name: string;
+  unit_price: number;
+  total_value: number;
+  invoiceId: string;
 }

@@ -29,14 +29,17 @@ const LoginForm: React.FC = () => {
 
   const fetchLogin = useMutation({
     mutationFn: async (values: { email: string; password: string }) => {
-      const response = await fetch(`${process.env.BASE_URL}/auth/login/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/login/`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: values.email,
+            password: values.password,
+          }),
+        }
+      );
       return response.json();
     },
     onSuccess: () => {
@@ -153,7 +156,7 @@ const LoginForm: React.FC = () => {
           </div>
         </FormikProvider>
 
-        <Divider className="my-6">
+        {/* <Divider className="my-6">
           <Typography
             component="span"
             color="textSecondary"
@@ -179,7 +182,7 @@ const LoginForm: React.FC = () => {
           >
             Create an account
           </Link>
-        </p>
+        </p> */}
       </div>
     </div>
   );

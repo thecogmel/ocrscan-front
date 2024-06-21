@@ -57,39 +57,42 @@ const OCRCard: React.FC<OCRCardProps> = ({ invoice }) => {
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Qnt.</TableCell>
-              <TableCell align="right">Item</TableCell>
-              <TableCell align="right">Valor</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Qnt.</TableCell>
+              <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                Item
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                Valor unit.
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                Valor total
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                1
-              </TableCell>
-              <TableCell align="right">Batata</TableCell>
-              <TableCell align="right">R$ 2,00</TableCell>
-            </TableRow>
-            <TableRow
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                1
-              </TableCell>
-              <TableCell align="right">Batata</TableCell>
-              <TableCell align="right">R$ 2,00</TableCell>
-            </TableRow>
-            <TableRow
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                1
-              </TableCell>
-              <TableCell align="right">Batata</TableCell>
-              <TableCell align="right">R$ 2,00</TableCell>
-            </TableRow>
+            {invoice.items.map((item) => (
+              <TableRow
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                key={item.id}
+              >
+                <TableCell component="th" scope="row">
+                  {item.quantity}
+                </TableCell>
+                <TableCell align="right">{item.name}</TableCell>
+                <TableCell align="right">
+                  {item.unit_price.toLocaleString('pt-br', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  })}
+                </TableCell>
+                <TableCell align="right">
+                  {item.total_value.toLocaleString('pt-br', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  })}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>

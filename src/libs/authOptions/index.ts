@@ -20,14 +20,17 @@ export const authOptions: AuthOptions = {
         }
 
         try {
-          const response = await fetch('http://127.0.0.1:1234/auth/login/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-          });
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/auth/login/`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            }
+          );
           if (response.status !== 201) return null;
           const authData = await response.json();
 
