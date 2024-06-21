@@ -156,7 +156,7 @@ const LoginForm: React.FC = () => {
           </div>
         </FormikProvider>
 
-        {/* <Divider className="my-6">
+        <Divider className="my-6">
           <Typography
             component="span"
             color="textSecondary"
@@ -168,21 +168,21 @@ const LoginForm: React.FC = () => {
             or sign in with
           </Typography>
         </Divider>
-        <div className="flex justify-center ">
+        {/* <div className="flex justify-center ">
           <Button variant="outlined" fullWidth startIcon={<FaGithub />}>
             Sign in with Github
           </Button>
-        </div>
+        </div> */}
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Not a member?{' '}
           <Link
-            href="https://github.com/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F&source=header-home"
+            href="/create-account"
             className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
           >
             Create an account
           </Link>
-        </p> */}
+        </p>
       </div>
     </div>
   );

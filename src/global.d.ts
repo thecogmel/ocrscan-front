@@ -20,3 +20,9 @@ interface Item {
   total_value: number;
   invoiceId: string;
 }
+
+interface CreateUserFormValues {
+  name: string;
+  email: string;
+  password: string;
+}
