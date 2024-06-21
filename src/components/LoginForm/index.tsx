@@ -25,10 +25,11 @@ import { errors } from '@utils';
 
 const LoginForm: React.FC = () => {
   const [state, { toggle }] = useToggle();
+  const loginToggle = useToggle(false);
 
   const fetchLogin = useMutation({
     mutationFn: async (values: { email: string; password: string }) => {
-      const response = await fetch('http://localhost:1234/auth/login/', {
+      const response = await fetch(`${process.env.BASE_URL}/auth/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -53,12 +54,13 @@ const LoginForm: React.FC = () => {
         .required(errors.required),
     }),
     onSubmit: async (values) => {
-      //fetchLogin.mutateAsync(values);
+      loginToggle[1].toggle();
       await signIn('credentials', {
         email: values.email,
         password: values.password,
         callbackUrl: '/home',
       });
+      loginToggle[1].toggle();
     },
   });
 
@@ -104,14 +106,6 @@ const LoginForm: React.FC = () => {
               >
                 Password
               </label>
-              {/* <div className="text-sm">
-                <a
-                  href="#"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500"
-                >
-                  Forgot password?
-                </a>
-              </div> */}
             </div>
             <div className="mt-2">
               <TextField
@@ -150,7 +144,7 @@ const LoginForm: React.FC = () => {
               variant="contained"
               size="large"
               type="submit"
-              loading={false}
+              loading={loginToggle[0]}
               fullWidth
               onClick={() => formik.handleSubmit()}
             >

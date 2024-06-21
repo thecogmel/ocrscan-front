@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 import {
@@ -9,8 +11,13 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
+import Link from 'next/link';
 
-const OCRCard: React.FC = () => {
+interface OCRCardProps {
+  invoice: Invoice;
+}
+
+const OCRCard: React.FC<OCRCardProps> = ({ invoice }) => {
   /*   const token = getCookie('token');
   const response = await new Promise((resolve) => {
     setTimeout(() => {
@@ -26,12 +33,26 @@ const OCRCard: React.FC = () => {
   }); */
   return (
     <div className="mt-3 sm:mx-auto sm:w-full sm:max-w-lg bg-white p-6 rounded-lg">
-      <h1 className="w-full text-2xl font-bold text-gray-900">
-        modelo-invoice.jpg
+      <h1 className="w-full text-2xl font-bold text-gray-900 mb-2">
+        {invoice.url.split('/').pop()}
       </h1>
-      <p className="text-sm text-gray-500  w-full ">
-        Enviado: 12/20/2021 - 12:00
+      <p className="text-sm text-gray-500 w-full">
+        Processado:{' '}
+        {invoice.processed_at !== null
+          ? new Date(invoice.processed_at).toLocaleDateString('pt-BR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          : 'Não'}
       </p>
+      <Link
+        href={invoice.url}
+        target="_blank"
+        className="block text-sm truncate text-gray-500"
+      >
+        URL: {invoice.url}
+      </Link>
       <TableContainer component={Paper} className="my-5">
         <Table aria-label="simple table">
           <TableHead>

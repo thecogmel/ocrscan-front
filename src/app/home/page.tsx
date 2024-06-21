@@ -1,10 +1,11 @@
 'use client';
 
-import React, { Suspense, useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 import { LoadingButton } from '@mui/lab';
-import { Button, styled } from '@mui/material';
+import { styled } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useToggle } from 'ahooks';
 import { signOut, useSession } from 'next-auth/react';
 import { enqueueSnackbar } from 'notistack';
 import { IoMdCloudUpload } from 'react-icons/io';
@@ -26,32 +27,28 @@ const VisuallyHiddenInput = styled('input')({
 
 const Home: React.FC = () => {
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const logoutToggle = useToggle(false);
 
   const { data } = useSession();
 
-  const fetchApi = useQuery({
+  const fetchInvoices = useQuery({
     queryFn: async () => {
-      return await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(
-            fetch('http://localhost:1234/', {
-              method: 'GET',
-              headers: {
-                Authorization: `Bearer ${(data as any)?.apiToken?.access_token}`,
-              },
-            })
-          );
-        }, 2000);
+      const response = await fetch(`http://127.0.0.1:2345/invoices/`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${(data as any)?.apiToken?.access_token}`,
+        },
       });
+      return response.json() as Promise<Invoice[]>;
     },
-    queryKey: ['get'],
+    queryKey: ['invoices'],
   });
 
   const sendFileRequest = useMutation({
     mutationFn: async () => {
       const formData = new FormData();
       formData.append('file', selectedFile as File);
-      return await fetch('http://localhost:1234/invoices/ocr', {
+      return await fetch(`${process.env.BASE_URL}/invoices/ocr`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${(data as any)?.apiToken?.access_token}`,
@@ -82,7 +79,7 @@ const Home: React.FC = () => {
     <main>
       <div className="flex flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-lg">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+          <h2 className="mt-10 italic text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             OCR Scan
           </h2>
         </div>
@@ -90,7 +87,7 @@ const Home: React.FC = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-lg bg-white p-12 rounded-lg">
           <form className="space-y-6" action="#" method="POST">
             <div>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col items-center justify-between space-y-4">
                 <LoadingButton
                   component="label"
                   role={undefined}
@@ -111,10 +108,33 @@ const Home: React.FC = () => {
             </div>
           </form>
         </div>
-
-        <OCRCard />
-
-        <Button onClick={async () => await signOut()}>Logout</Button>
+        {fetchInvoices.isLoading ? (
+          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-lg bg-white p-6 rounded-lg">
+            <OCRCardLoading />
+            <OCRCardLoading />
+          </div>
+        ) : (
+          <div>
+            {fetchInvoices.data?.map((invoice) => (
+              <OCRCard key={invoice.id} invoice={invoice} />
+            ))}
+          </div>
+        )}
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-lg bg-white p-6 rounded-lg">
+          <LoadingButton
+            loading={logoutToggle[0]}
+            variant="contained"
+            color="error"
+            fullWidth
+            onClick={async () => {
+              logoutToggle[1].toggle();
+              await signOut();
+              logoutToggle[1].toggle();
+            }}
+          >
+            Logout
+          </LoadingButton>
+        </div>
       </div>
     </main>
   );
