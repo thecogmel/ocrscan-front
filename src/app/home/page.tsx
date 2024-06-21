@@ -9,6 +9,7 @@ import { useToggle } from 'ahooks';
 import { signOut, useSession } from 'next-auth/react';
 import { enqueueSnackbar } from 'notistack';
 import { IoMdCloudUpload } from 'react-icons/io';
+import { MdOutlineLogout } from 'react-icons/md';
 
 import OCRCard from '@components/OCRCard';
 import OCRCardLoading from '@components/OCRCardLoading';
@@ -141,6 +142,7 @@ const Home: React.FC = () => {
               await signOut();
               logoutToggle[1].toggle();
             }}
+            startIcon={<MdOutlineLogout />}
           >
             Logout
           </LoadingButton>

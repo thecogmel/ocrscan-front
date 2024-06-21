@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
 import {
   Paper,
@@ -31,6 +31,16 @@ const OCRCard: React.FC<OCRCardProps> = ({ invoice }) => {
       );
     }, 2000);
   }); */
+  const [total, setTotal] = useState(0);
+
+  const calculateTotal = useCallback(() => {
+    const total = invoice.items.reduce(
+      (acc, item) => acc + item.total_value,
+      0
+    );
+    return total * 1.23;
+  }, [invoice.items]);
+
   return (
     <div className="mt-3 sm:mx-auto sm:w-full sm:max-w-lg bg-white p-6 rounded-lg">
       <h1 className="w-full text-2xl font-bold text-gray-900 mb-2">
@@ -98,7 +108,11 @@ const OCRCard: React.FC<OCRCardProps> = ({ invoice }) => {
       </TableContainer>
 
       <h2 className="font-bold text-sm text-gray-500 mt-5 w-full text-right">
-        Valor total: R$325,00
+        Valor total com impostos:{' '}
+        {calculateTotal().toLocaleString('pt-br', {
+          style: 'currency',
+          currency: 'BRL',
+        })}
       </h2>
     </div>
   );
