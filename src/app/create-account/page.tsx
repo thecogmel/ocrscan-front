@@ -24,6 +24,9 @@ const CreateAccount: React.FC = () => {
     mutationFn: async (values: CreateUserFormValues) => {
       return await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users/`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           email: values.email,
           password: values.password,
